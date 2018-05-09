@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev
+  labels:
+    app: dev
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: dev
+
+# https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing

@@ -1,0 +1,68 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+
+# https://cloud.google.com/kubernetes-engine/docs/tutorials/persistent-disk
+
+# Log into a container with a proxy connection, make an account and database
+# CREATE DATABASE tsugi DEFAULT CHARACTER SET utf8;
+# GRANT ALL ON tsugi.* TO 'ltiuser'@'%' IDENTIFIED BY 'ltipassword';
+
+# Make a secret for that database
+# kubectl create secret generic tsugi-db-credentials --from-literal=username=ltiuser --from-literal=password=ltipassword
+# kubectl create secret generic tsugi-admin-password --from-literal=password=appstore
+# kubectl create secret generic tsugi-admin-password --from-literal=password=sha256:eaffb3558916...
+
+metadata:
+  name: base
+  labels:
+    app: base
+spec:
+  template:
+    metadata:
+      labels:
+        app: base
+    spec:
+      containers:
+        - name: web
+          image: us.gcr.io/nd-edu/tsugi_base:latest
+          ports:
+            - containerPort: 80
+          env:
+          - name: TOWEL
+            value: "42"
+          - name: TSUGI_USER
+            valueFrom:
+              secretKeyRef:
+                name: tsugi-db-credentials
+                key: username
+          - name: TSUGI_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: tsugi-db-credentials
+                key: password
+          ports:
+          volumeMounts:
+            # name must match the volume name below
+            - name: my-pvc-nfs
+              mountPath: "/data"
+        # [END web_container]
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command: ["/cloud_sql_proxy",
+                    "-instances=sandbox-199519:us-central1:sandbox-db-01=tcp:3306",
+                    "-credential_file=/secrets/cloudsql/credentials.json"]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+        # [END cloudsql_proxy_container]
+      volumes:
+        - name: my-pvc-nfs
+          persistentVolumeClaim:
+            claimName: nfs
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+      # [END volumes]
+
+

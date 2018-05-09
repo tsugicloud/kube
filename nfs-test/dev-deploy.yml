@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: dev
+  labels:
+    app: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev
+  # https://tachingchen.com/blog/kubernetes-rolling-update-with-deployment/
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: dev
+    spec:
+      containers:
+      - name: dev
+        image: us.gcr.io/nd-edu/tsugi_dev:latest
+        env:
+        - name: TSUGI_APPHOME
+          value: "https://dev.tsugicloud.org"
+        - name: TSUGI_WWWROOT
+          value: "https://dev.tsugicloud.org/tsugi"
+        - name: TSUGI_SERVICENAME
+          value: "TSFUN"
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          # name must match the volume name below
+          - name: my-pvc-nfs
+            mountPath: "/data"
+      volumes:
+      - name: my-pvc-nfs
+        persistentVolumeClaim:
+          claimName: nfs
+
