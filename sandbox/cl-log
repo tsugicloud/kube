@@ -1,0 +1,17 @@
+#! /bin/bash
+
+if [ -z "$1" ] ; then
+   echo "Missing parameter"
+   exit
+fi 
+
+POD=`kubectl get pods | grep ^${1} | awk '{print $1}' | head -1`
+
+if [ -z "$POD" ] ; then
+  echo Pod $1 not found
+  exit
+fi
+
+echo Getting logs from $POD
+echo kubectl logs -f $POD 
+kubectl logs -f $POD 

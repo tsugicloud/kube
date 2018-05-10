@@ -5,21 +5,39 @@ metadata:
 # https://kubernetes.io/docs/concepts/services-networking/ingress/
 spec:
   rules:
-  - host: dev.lrnxp.net
-    http:
-      paths:
-      - backend:
-          serviceName: dev
-          servicePort: 80
-  - host: tsugi.lrnxp.net
-    http:
-      paths:
-      - backend:
-          serviceName: tsugi
-          servicePort: 80
   - host: dev.tsugicloud.org
     http:
       paths:
       - backend:
           serviceName: dev
+          servicePort: 80
+  - host: dev1.tsugicloud.org
+    http:
+      paths:
+      - backend:
+          serviceName: dev1
+          servicePort: 80
+  - host: dev2.tsugicloud.org
+    http:
+      paths:
+      - backend:
+          serviceName: dev2
+          servicePort: 80
+  - host: dev3.tsugicloud.org
+    http:
+      paths:
+      - backend:
+          serviceName: dev3
+          servicePort: 80
+  - host: dev4.tsugicloud.org
+    http:
+      paths:
+      - backend:
+          serviceName: dev4
+          servicePort: 80
+  - host: dev5.tsugicloud.org
+    http:
+      paths:
+      - backend:
+          serviceName: dev5
           servicePort: 80
